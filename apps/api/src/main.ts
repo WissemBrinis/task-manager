@@ -8,10 +8,15 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  app.enableCors({
-    origin: ['http://localhost:5173'],
-    credentials: true,
-  });
+  const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+app.enableCors({
+  origin: allowedOrigins,
+  credentials: true,
+});
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -30,9 +35,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
-  console.log(`🚀 API running at http://localhost:3000/api`);
-  console.log(`📚 Swagger docs at http://localhost:3000/api/docs`);
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`🚀 API running on port ${port}`);
+  console.log(`📚 Swagger docs: /api/docs`);
 }
 
 bootstrap();
